@@ -1,21 +1,35 @@
-// src/Login.js
 import React, { useState } from 'react';
 
 const Login = () => {
 const [email, setEmail] = useState('');
 const [password, setPassword] = useState('');
+const [error, setError] = useState(null); // État pour gérer les erreurs
 
 const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null); // Réinitialiser l'erreur avant de soumettre
+    try {
     const response = await fetch('http://localhost:3000/api/auth/login', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ email, password })
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
     });
+
+    if (!response.ok) {
+        // Si le serveur renvoie un statut d'erreur, afficher un message
+        throw new Error('Identifiants incorrects ou utilisateur inconnu');
+    }
+
     const data = await response.json();
-    console.log('Login', data);
+    localStorage.setItem('token', data.token);
+    sessionStorage.setItem('user', JSON.stringify(data));
+    window.location.href = '/posts';
+    } catch (error) {
+    console.error('Erreur lors de la connexion', error);
+    setError('Impossible de se connecter. Vérifiez vos identifiants.');
+    }
 };
 
 return (
@@ -48,13 +62,13 @@ return (
             required
         />
         </div>
-        <button
-        type="submit"
-        className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
+        <button type="submit" className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
         Login
         </button>
     </form>
+    {error && (
+        <p className="mt-4 text-red-500">{error}</p> // Affichage du message d'erreur
+    )}
     </div>
 );
 };

@@ -1,26 +1,24 @@
-// src/PostList.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PostItem from '../components/PostItem';
 import PostModal from '../components/PostModal';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, ArrowRight } from 'lucide-react';
 
 const PostList = () => {
-const [posts, setPosts] = useState([
-    {
-    title: 'First Random Post',
-    content: 'This is the content of the first random post.',
-    likes: 5,
-    comments: ['Great post!', 'Very informative.']
-    },
-    {
-    title: 'Second Random Post',
-    content: 'This is the content of the second random post.',
-    likes: 2,
-    comments: ['I found this useful.', 'Thanks for sharing!']
-    }
-]);
+const [token, setToken] = useState(null); // Utilise null pour l'état initial de chargement
+const [posts, setPosts] = useState([]);
 const [isModalOpen, setIsModalOpen] = useState(false);
 const [error, setError] = useState('');
+
+useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+    // Redirection si pas de token
+    window.location.href = '/login';
+    } else {
+    // Si le token existe, on le met dans l'état
+    setToken(token);
+    }
+}, []);
 
 const addPost = (newPost) => {
     setPosts([newPost, ...posts]);
@@ -35,6 +33,20 @@ const handlePostCreation = (post) => {
     setError('');
 };
 
+const disconnect = () => {
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    window.location.href = '/login';
+};
+
+// Gestion de l'affichage selon l'état du token ou si le token dans la session est différent de celui dans localStorage
+if (token === null) {
+    return (
+    <div className="loader"></div>
+    );
+}
+
+
 return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 p-6">
     <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
@@ -46,6 +58,13 @@ return (
         >
             <PlusCircle className="w-6 h-6 mr-2" />
             <span className="text-lg">Create Post</span>
+        </button>
+        <button
+            className="flex items-center px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none"
+            onClick={disconnect}
+        >
+            <span>Disconnect</span>
+            <ArrowRight className="ml-2 h-5 w-5" />
         </button>
         </div>
         <div className="p-6 border-t border-gray-200">
