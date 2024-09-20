@@ -103,6 +103,8 @@ return (
         onClose={() => setIsModalOpen(false)}
         onPostCreate={handlePostCreation}
         error={error} // Passer l'erreur à la modale
+        fetchPosts={fetchPosts}
+        token={token}
     />
     </div>
 );

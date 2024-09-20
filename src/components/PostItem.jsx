@@ -5,7 +5,6 @@ const PostItem = ({ post }) => {
 const [likes, setLikes] = useState(post.likes || 0);
 const [comments, setComments] = useState([]);
 const [comment, setComment] = useState('');
-console.log(post.User.username);
 const handleLike = () => {
     setLikes(likes + 1);
 };

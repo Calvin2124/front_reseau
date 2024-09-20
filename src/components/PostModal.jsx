@@ -2,45 +2,53 @@ import React, { useState } from 'react';
 import { Dialog } from '@headlessui/react';
 import { XCircle } from 'lucide-react';
 
-const PostModal = ({ isOpen, onClose, onPostCreate }) => {
+const PostModal = ({ isOpen, onClose, onPostCreate, fetchPosts }) => {
 const [content, setContent] = useState('');
 const [error, setError] = useState('');
 const [isLoading, setIsLoading] = useState(false);
-const tokenUser = localStorage.getItem('token');
 
 const handlePostCreate = async (e) => {
     e.preventDefault();
-    if (!content) {
-    setError('Content is required.');
-    return;
+    if (!content.trim()) {
+        setError('Le contenu est obligatoire.');
+        return;
     }
     setIsLoading(true);
     setError('');
+    
     const sessionUser = JSON.parse(sessionStorage.getItem('user'));
+    const tokenUser = localStorage.getItem('token');
+
     try {
-    // Remplacez l'URL par l'endpoint de votre API
-    const response = await fetch('http://localhost:3000/api/messages/create', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        'bearer' : tokenUser
-        },
-        body: JSON.stringify({ content, likes: 0, comments: [], idUser: sessionUser.idUser }),
-    });
+        const response = await fetch('http://localhost:3000/api/messages/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'bearer' : tokenUser
+            },
+            body: JSON.stringify({ 
+                content, 
+                likes: 0, 
+                comments: [], 
+                idUser: sessionUser.idUser 
+            }),
+        });
 
-    if (!response.ok) {
-        throw new Error('Failed to create post');
-    }
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Échec de la création du post');
+        }
 
-    const newPost = await response.json();
-    onPostCreate(newPost);
-    setContent('');
-    onClose();
+        const newPost = await response.json();
+        onPostCreate(newPost);
+        setContent('');
+        await fetchPosts(tokenUser); // Ajout de await ici
+        onClose();
     } catch (err) {
-    setError('An error occurred while creating the post. Please try again.');
-    console.error('Error creating post:', err);
+        setError('Une erreur est survenue lors de la création du post. Veuillez réessayer.');
+        console.error('Erreur lors de la création du post:', err);
     } finally {
-    setIsLoading(false);
+        setIsLoading(false);
     }
 };
 
