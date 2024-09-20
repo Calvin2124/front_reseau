@@ -6,8 +6,8 @@ import { PlusCircle, ArrowRight } from 'lucide-react';
 const PostList = () => {
 const [token, setToken] = useState(null); // Utilise null pour l'état initial de chargement
 const [posts, setPosts] = useState([]);
-const [isModalOpen, setIsModalOpen] = useState(false);
 const [error, setError] = useState('');
+const [isModalOpen, setIsModalOpen] = useState(false);
 
 useEffect(() => {
     const token = localStorage.getItem('token');
@@ -17,20 +17,40 @@ useEffect(() => {
     } else {
     // Si le token existe, on le met dans l'état
     setToken(token);
+    fetchPosts(token)
     }
 }, []);
+
+const fetchPosts = async (token) => {
+    try {
+    const response = await fetch('http://localhost:3000/api/messages', {
+        method: 'GET',
+        headers: {
+        'bearer': token
+        }
+    })
+    if (!response.ok) {
+        throw new Error('Failed to fetch posts')
+    }
+    const data = await response.json()
+    setPosts(data.messages)
+    } catch (error) {
+    setError('Failed to load posts. Please try again.')
+    console.error('Error fetching posts:', error)
+    }
+}
 
 const addPost = (newPost) => {
     setPosts([newPost, ...posts]);
 };
 
 const handlePostCreation = (post) => {
-    if (!post.title || !post.content) {
-    setError('Title and content are required.');
+    if (!post.content) {
+    setError('Content is required.');
     return;
     }
     addPost(post);
-    setError('');
+    setError(''); // Réinitialiser l'erreur si tout est bon
 };
 
 const disconnect = () => {
@@ -41,11 +61,8 @@ const disconnect = () => {
 
 // Gestion de l'affichage selon l'état du token ou si le token dans la session est différent de celui dans localStorage
 if (token === null) {
-    return (
-    <div className="loader"></div>
-    );
+    return <div className="loader"></div>;
 }
-
 
 return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 p-6">
@@ -71,7 +88,7 @@ return (
         <div className="p-6 space-y-6">
             {posts.length > 0 ? (
             <div className="grid grid-cols-1 gap-6">
-                {posts.map((post, index) => (
+                {posts.slice().reverse().map((post, index) => (
                 <PostItem key={index} post={post} />
                 ))}
             </div>
@@ -79,12 +96,13 @@ return (
             <p className="text-gray-600">No posts available. Create one!</p>
             )}
         </div>
-        </div>
+</div>
     </div>
     <PostModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onPostCreate={handlePostCreation}
+        error={error} // Passer l'erreur à la modale
     />
     </div>
 );

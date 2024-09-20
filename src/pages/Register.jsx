@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
 const Register = () => {
-const [name, setName] = useState('');
+const [username, setUsername] = useState('');
 const [email, setEmail] = useState('');
-const [password, setPassword] = useState('');
+const [password_hash, setPasswordHash] = useState('');
 const [message, setMessage] = useState('');
 const [isError, setIsError] = useState(false);
 
@@ -15,7 +15,7 @@ const handleSubmit = async (e) => {
         headers: {
         'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ username, email, password_hash })
     });
     const data = await response.json();
     if (response.ok) {
@@ -48,8 +48,8 @@ return (
         <input
             type="text"
             id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded"
             required
         />
@@ -74,8 +74,8 @@ return (
         <input
             type="password"
             id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={password_hash}
+            onChange={(e) => setPasswordHash(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded"
             required
         />

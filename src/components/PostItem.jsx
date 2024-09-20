@@ -5,7 +5,7 @@ const PostItem = ({ post }) => {
 const [likes, setLikes] = useState(post.likes || 0);
 const [comments, setComments] = useState([]);
 const [comment, setComment] = useState('');
-
+console.log(post.User.username);
 const handleLike = () => {
     setLikes(likes + 1);
 };
@@ -22,11 +22,9 @@ const handleCommentSubmit = (e) => {
     }
 };
 
-
-
 return (
     <div className="bg-white p-6 mb-4 rounded shadow-md">
-    <h2 className="text-xl font-bold mb-2">{post.title}</h2>
+    <h2 className="text-xl font-bold mb-2">{post.User.username}</h2>
     <p className="text-gray-700 mb-4">{post.content}</p>
     <div className="flex items-center mb-4">
         <button

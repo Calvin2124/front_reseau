@@ -2,33 +2,13 @@
 import React, { useState } from 'react';
 
 const CreatePost = ({ onPostCreate }) => {
-const [title, setTitle] = useState('');
 const [content, setContent] = useState('');
-
-const handleSubmit = (e) => {
-    e.preventDefault();
-    const newPost = { title, content, likes: 0, comments: [] };
-    onPostCreate(newPost);
-    setTitle('');
-    setContent('');
-};
+const sessionUser = JSON.parse(sessionStorage.getItem('user'));
+console.log(sessionUser.userId);
 
 return (
     <form onSubmit={handleSubmit} className="bg-white p-6 mb-6 rounded shadow-md">
     <h2 className="text-xl font-bold mb-4">Create a New Post</h2>
-    <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
-        Title
-        </label>
-        <input
-        type="text"
-        id="title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="w-full px-3 py-2 border border-gray-300 rounded"
-        required
-        />
-    </div>
     <div className="mb-6">
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="content">
         Content
